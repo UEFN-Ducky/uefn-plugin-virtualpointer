@@ -1,13 +1,13 @@
 ---
 name: virtualpointer
 description: "UEFN Virtual Pointer (Experimental) — cross-platform pointer input via Verse Enhanced Input: TouchMapping, PointerSelect, PointerZoom, swipes, pinch zoom/scale, screen-space deproject and world traces. Use when the user mentions virtual pointer, touch mapping, PointerSelect, PointerZoom, pinch, swipe, or cross-platform on-screen pointer."
-license: All Rights Reserved
+license: MIT
 metadata:
   label: UEFN Virtual Pointer
   version: 1
   author: UEFN-Ducky
-  copyright: Copyright 2026 UEFN-Ducky
-  allow_redistribute: false
+  copyright: Copyright 2026 Mindful Path Company, LLC
+  allow_redistribute: true
   managed_by: uefn-ducky
 ---
 

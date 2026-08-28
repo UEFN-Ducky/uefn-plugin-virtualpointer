@@ -20,3 +20,7 @@ Writes `deploy/uefn-virtualpointer-1.0.0.ducky-plugin.zip` (scripts/ and deploy/
 ```bash
 py scripts/release.py --publish --changelog "v1: Virtual Pointer Experimental skill pack"
 ```
+
+## License
+
+MIT. Copyright (c) 2026 Mindful Path Company, LLC. See [LICENSE](LICENSE).
