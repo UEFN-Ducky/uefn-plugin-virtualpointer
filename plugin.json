@@ -1,9 +1,9 @@
 {
   "id": "uefn-virtualpointer",
   "kind": "plugin",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "label": "UEFN Virtual Pointer",
-  "description": "UEFN Virtual Pointer (Experimental) \u2014 cross-platform pointer via Verse Enhanced Input: TouchMapping, PointerSelect, PointerZoom, swipes, pinch, screen-space deproject/trace. Bundles the virtualpointer skill.",
+  "description": "UEFN Virtual Pointer (Experimental) — cross-platform pointer via Verse Enhanced Input: TouchMapping, PointerSelect, PointerZoom, swipes, pinch, screen-space deproject/trace. Bundles the virtualpointer skill.",
   "min_app_version": "1.0.0",
   "default_enabled": true,
   "secret_keys": [],
