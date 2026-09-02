@@ -1,39 +1,101 @@
-# PointerZoom — pinch, scroll, right-stick zoom / scale
+# PointerZoom — pinch, scroll, right-stick zoom / scale (Experimental)
 
-`PointerZoom` is an experimental `input_action(vector3)` in `/Verse.org/Input/UI` (FN ≥ 4120).
+`PointerZoom` is an `@experimental` `input_action(vector3)` in `/Verse.org/Input/UI` (FN ≥ 4120). **Islands that use PointerZoom cannot be published.** Say so before writing it, and keep it in its own device so it can be removed.
 
-Pinch actions are continuous input for camera zoom and object scaling. Behavior by device:
+Pinch is a continuous input for camera zoom and object scaling. The pinch magnitude arrives in the payload's `vector3.Forward`.
 
 | Device | Control | Value | Center |
 |--------|---------|-------|--------|
-| Touch | Two fingers pinch in/out | Speed of pinch; `0` = no change | Midpoint between fingers |
-| Mouse + keyboard | Scroll wheel | `-1` to `1` by direction; freewheel feels closer to stick | Current pointer position |
-| Controller | Right stick Up = zoom in, Down = zoom out | Stick deflection `-1`…`1` | Virtual Pointer position |
+| Touch | Two fingers together / apart | Speed of pinch; `0` = no change | Midpoint between the fingers |
+| Mouse + keyboard | Scroll wheel | `-1` to `1` by direction; freewheel mode behaves more like a stick | Current pointer position |
+| Controller | Right stick Up = zoom in, Down = zoom out | Deflection from neutral `-1`…`1` | Virtual Pointer position |
 
-## Subscribe (zoom logging example)
+## Subscribe (zoom logging)
 
 ```verse
 using { /Verse.org/Input }
 using { /Verse.org/Input/UI }
+using { /Verse.org/SpatialMath }
 
-EnableCursorZoom(Player:player):void=
-    if:
-        PlayerInput := GetPlayerInput[Player]
-    then:
+EnableCursorZoom(Player : player):void =
+    if (PlayerInput := GetPlayerInput[Player]):
         PlayerInput.AddInputMapping(TouchMapping)
-        BeginSub := PlayerInput.GetInputEvents(PointerZoom).BeginDetectEvent.Subscribe(OnPinchBegin)
-        OngoingSub := PlayerInput.GetInputEvents(PointerZoom).DetectionOngoingEvent.Subscribe(OnPinchOngoing)
-        TriggerSub := PlayerInput.GetInputEvents(PointerZoom).TriggerActivationEvent.Subscribe(OnPinchTrigger)
-        EndSub := PlayerInput.GetInputEvents(PointerZoom).EndDetectEvent.Subscribe(OnPinchEnd)
+        ZoomEvents := PlayerInput.GetInputEvents(PointerZoom)
+        BeginSub := ZoomEvents.BeginDetectEvent.Subscribe(OnPinchBegin)
+        OngoingSub := ZoomEvents.DetectionOngoingEvent.Subscribe(OnPinchOngoing)
+        TriggerSub := ZoomEvents.TriggerActivationEvent.Subscribe(OnPinchTrigger)
+        EndSub := ZoomEvents.EndDetectEvent.Subscribe(OnPinchEnd)
+        # keep BeginSub/OngoingSub/TriggerSub/EndSub in a [player][]cancelable map
+
+OnPinchBegin(Arg : tuple(player, vector3)):void =
+    Print("PINCH begin | Fwd={Arg(1).Forward}")
+
+OnPinchOngoing(Arg : tuple(player, vector3, float)):void =
+    Print("PINCH ongoing | Fwd={Arg(1).Forward}")
+
+OnPinchTrigger(Arg : tuple(player, vector3)):void =
+    Print("PINCH trigger | Fwd={Arg(1).Forward}")
+
+OnPinchEnd(Arg : tuple(player, float)):void =
+    Print("PINCH end")
 ```
 
-Implement `OnPinchBegin` / `OnPinchOngoing` / `OnPinchTrigger` / `OnPinchEnd` to apply camera FOV or entity scale. Keep cancelables and cancel on exit.
+Which live phase fires (`DetectionOngoing` vs `TriggerActivation`) depends on platform/input, so route **both** into the same apply function.
 
-## Resizing a Scene Graph entity
+## Resizing a Scene Graph entity (pinch-to-scale)
 
 1. Place Actors → Entities → `entity`.
-2. Add `mesh_component` (e.g. Cube).
-3. Wire a Verse device `@editable` entity ref (`PropToScale`) to that entity.
-4. On `PointerZoom` ongoing/trigger, multiply entity transform scale by pinch delta (confirm Scene Graph transform APIs via `search_verse_digest` — never invent).
+2. `+ Component` → `mesh_component` (e.g. Cube).
+3. Place the device; set `PropToScale` to that entity in Details.
 
-Epic’s tutorial device is often named `pinch_scale_device` — adapt into `Verse/<System>/` (never dump at Verse root). Set `PropToScale` to the scalable mesh entity in Details.
+Core of the device (full file: `verse_template_apply("vp_pinch_scale")`):
+
+```verse
+using { /Verse.org/SceneGraph }
+using { /Verse.org/SpatialMath }
+
+@editable
+var PropToScale : entity = entity{}
+@editable
+var ScaleSensitivity : float = 2.0
+@editable
+var MinScale : float = 0.25
+@editable
+var MaxScale : float = 5.0
+@editable
+var MinPinchAmount : float = 0.001
+
+var CurrentScale : float = 1.0
+var BaseScale : vector3 = vector3{Forward := 1.0, Left := 1.0, Up := 1.0}
+
+OnBegin<override>()<suspends>:void =
+    set BaseScale = PropToScale.GetGlobalTransform().Scale
+    # ... EnableFor each player + PlayerAddedEvent
+
+OnZoomOngoing(Arg : tuple(player, vector3, float)):void =
+    ApplyPinch(Arg(1).Forward)
+
+OnZoomTrigger(Arg : tuple(player, vector3)):void =
+    ApplyPinch(Arg(1).Forward)
+
+ApplyPinch(Forward : float):void =
+    if (Forward > MinPinchAmount or Forward < -MinPinchAmount):
+        # Exp keeps scaling smooth and symmetric; negated so pinch direction matches expectation.
+        Proposed := CurrentScale * Exp(-Forward * ScaleSensitivity)
+        set CurrentScale = Max(MinScale, Min(MaxScale, Proposed))
+        T := PropToScale.GetGlobalTransform()
+        NewScale := vector3{
+            Forward := BaseScale.Forward * CurrentScale
+            Left := BaseScale.Left * CurrentScale
+            Up := BaseScale.Up * CurrentScale
+        }
+        PropToScale.SetGlobalTransform(transform{Translation := T.Translation, Rotation := T.Rotation, Scale := NewScale})
+```
+
+Digest: `(InEntity:entity).GetGlobalTransform()<transacts>:transform` and `SetGlobalTransform(NewGlobalTransform:transform)<transacts>:void` in `/Verse.org/SceneGraph`; `Exp(X:float)<reads>:float`, `Min/Max(X:float, Y:float)`.
+
+## Cleanup
+
+Cancel all four subscriptions per player in `OnEnd` and `RemoveInputMapping(TouchMapping)`.
+
+Never dump the device at `Content/Verse/` root — `Verse/VirtualPointer/pinch_scale_device.verse`.

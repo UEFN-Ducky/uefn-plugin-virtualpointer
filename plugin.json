@@ -1,9 +1,9 @@
 {
   "id": "uefn-virtualpointer",
   "kind": "plugin",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "label": "UEFN Virtual Pointer",
-  "description": "UEFN Virtual Pointer (Experimental) — cross-platform pointer via Verse Enhanced Input: TouchMapping, PointerSelect, PointerZoom, swipes, pinch, screen-space deproject/trace. Bundles the virtualpointer skill.",
+  "description": "UEFN Virtual Pointer — cross-platform pointer via Verse Enhanced Input: TouchMapping + PointerSelect (publishable), PointerZoom (Experimental), swipes, taps, pinch, screen-space deproject/trace. Bundles the virtualpointer skill + 3 New-file Verse templates.",
   "min_app_version": "1.0.0",
   "default_enabled": true,
   "secret_keys": [],
@@ -17,12 +17,60 @@
         {
           "target": "settings.store.root",
           "title": "Virtual Pointer skill ready",
-          "body": "Experimental Virtual Pointer recipes are installed. Ask the agent about TouchMapping, PointerSelect, pinch zoom, swipes, or screen-space world traces.",
+          "body": "Virtual Pointer recipes + Verse templates are installed. Ask the agent about TouchMapping, PointerSelect, swipes, pinch zoom, or screen-space world traces, or pick a VP template in New file → Verse.",
           "advance": "next",
           "mode": "rect"
         }
       ]
-    }
+    },
+    "verse.templates": [
+      {
+        "id": "vp_screenspace_trace",
+        "name": "VP Screen-space Trace",
+        "icon": "🎯",
+        "description": "Virtual Pointer tap/click → DeprojectViewportToWorld → FindSweepHits. TouchMapping + PointerSelect (publishable).",
+        "file": "templates/screenspace_trace_device.verse",
+        "order": 80
+      },
+      {
+        "id": "vp_swipe_detector",
+        "name": "VP Swipe Detector",
+        "icon": "👆",
+        "description": "Per-player swipe / tap classifier (Up/Down/Left/Right) from PointerSelect Begin → Trigger → End. Publishable.",
+        "file": "templates/swipe_detector_device.verse",
+        "order": 81
+      },
+      {
+        "id": "vp_pinch_scale",
+        "name": "VP Pinch Scale (Experimental)",
+        "icon": "🤏",
+        "description": "PointerZoom pinch / scroll / right-stick → scale a Scene Graph entity. Experimental: cannot publish.",
+        "file": "templates/pinch_scale_device.verse",
+        "order": 82
+      },
+      {
+        "id": "virtualpointer",
+        "name": "Virtual Pointer Pack",
+        "icon": "🖱️",
+        "description": "All three Virtual Pointer devices in Verse/VirtualPointer/: screen-space trace, swipe detector, pinch scale (Experimental).",
+        "folder": "VirtualPointer",
+        "files": [
+          {
+            "path": "screenspace_trace_device.verse",
+            "file": "templates/screenspace_trace_device.verse"
+          },
+          {
+            "path": "swipe_detector_device.verse",
+            "file": "templates/swipe_detector_device.verse"
+          },
+          {
+            "path": "pinch_scale_device.verse",
+            "file": "templates/pinch_scale_device.verse"
+          }
+        ],
+        "order": 79
+      }
+    ]
   },
   "backend": {
     "entry": "backend",

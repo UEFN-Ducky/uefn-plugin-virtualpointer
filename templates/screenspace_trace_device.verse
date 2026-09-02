@@ -1,12 +1,6 @@
-# Example: screenspace_trace_device
-
-Complete Verse device that turns on Virtual Pointer mode for every player, subscribes to `PointerSelect`, and reports world objects that intersect the pointer trace. Uses only `TouchMapping` + `PointerSelect`, so it is **publishable**.
-
-Place under `Verse/VirtualPointer/screenspace_trace_device.verse` — never at `Content/Verse/` root. Same file as `verse_template_apply("vp_screenspace_trace")`.
-
-Fixes vs Epic's doc sample: the doc omits `using { /Verse.org/SceneGraph }` (so `collision_point` / `FindSweepHits` are unknown), declares `MaybeInputCancelableBegin` twice (once inside `OnBegin`), and never calls `StartSubscription`. This version compiles: it subscribes existing players plus `PlayerAddedEvent`, keeps cancelables per player, and cleans up in `OnEnd`.
-
-```verse
+# SETUP: Place this creative_device in the level. Every player enters Virtual Pointer mode on join
+# (TouchMapping) and is immobilized. PointerSelect + TouchMapping are publishable.
+# Tap / click / left-stick select -> deproject the screen point -> sweep a ray into the world.
 using { /Fortnite.com/Devices }
 using { /Fortnite.com/Playspaces }
 using { /Verse.org/Simulation }
@@ -18,7 +12,7 @@ using { /UnrealEngine.com/Temporary/Diagnostics }
 
 screenspace_trace_device := class(creative_device):
 
-    # How far (cm) to sweep along the pointer ray.
+    # How far (cm) to sweep along the pointer ray. Tune for your island scale.
     @editable
     MaxTraceDistance : float = 50000.0
 
@@ -30,6 +24,7 @@ screenspace_trace_device := class(creative_device):
             StartSubscription(Player)
         Playspace.PlayerAddedEvent().Subscribe(StartSubscription)
 
+    # Cancel subscriptions and leave Virtual Pointer mode.
     OnEnd<override>():void =
         for (Player -> Subs : SubsByPlayer):
             for (Sub : Subs):
@@ -40,17 +35,28 @@ screenspace_trace_device := class(creative_device):
 
     StartSubscription(Player : player):void =
         if (PlayerInput := GetPlayerInput[Player]):
+            # TouchMapping puts the player in Virtual Pointer mode (movement disabled).
             PlayerInput.AddInputMapping(TouchMapping)
             BeginSub := PlayerInput.GetInputEvents(PointerSelect).BeginDetectEvent.Subscribe(PlayerClicked)
             if (set SubsByPlayer[Player] = array{BeginSub}) {}
+            Print("screenspace_trace_device: Virtual Pointer enabled")
 
+    # BeginDetectEvent payload: (player, screen position vector3 - Left/Up in cm, Forward unused)
     PlayerClicked(Arg : tuple(player, vector3)):void =
         Player := Arg(0)
         ClickPos := Arg(1)
 
         Ray := TraceFromClick(Player, ClickPos.Left, ClickPos.Up)
-        Displacement := Ray.Direction * MaxTraceDistance
-        StartTransform := transform{Translation := Ray.Origin}
+        RayOrigin := Ray.Origin
+        RayDir := Ray.Direction
+
+        # Sweep: ray direction * max distance
+        Displacement := RayDir * MaxTraceDistance
+
+        # Start at the ray origin (camera eye point - see deproject_results docs)
+        StartTransform := transform{Translation := RayOrigin}
+
+        # Point trace along the ray
         CollisionShape := collision_point{}
 
         Hits := for:
@@ -59,12 +65,10 @@ screenspace_trace_device := class(creative_device):
             Hit
 
         if (FirstHit := Hits[0]):
-            Print("HIT something at {FirstHit.ContactPosition}!")
+            Print("HIT something at {FirstHit.ContactPosition}")
         else:
             Print("MISS")
 
+    # Screen (cm) -> world ray. Only Left/Up are used; Forward is ignored.
     TraceFromClick(Player : player, ClickX : float, ClickY : float)<reads>:deproject_results =
         Player.DeprojectViewportToWorld(vector3{Left := ClickX, Up := ClickY, Forward := 0.0})
-```
-
-After writing: `workspace_list_verse_errors`, then place the device. If players must walk while the pointer is on, call `Player.GetFortCharacter[].ReleaseFromStasis()` after `AddInputMapping` (see `enable_disable.md`).
