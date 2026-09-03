@@ -13,6 +13,10 @@ metadata:
 
 # UEFN Virtual Pointer
 
+> **Snippets here are fragments.** The `using` block in this file's first code
+> block applies to all of them — copy those imports (or start from the matching
+> `verse_template_apply` pack) when pasting into a real `.verse` file.
+
 Add cross-platform pointer input to a UEFN island using Verse Enhanced Input, with custom input mappings, actions, and gestures.
 
 ## Publish status (say this first)
@@ -120,6 +124,12 @@ RemoveTouchInput(Player : player):void =
 | `virtualpointer` | all three → `Verse/VirtualPointer/` | Whole pack. |
 
 All templates subscribe existing players + `PlayerAddedEvent`, keep cancelables per player, and clean up in `OnEnd`.
+
+## Testing on mobile (v42.10)
+
+- **Mobile Preview** (UEFN toolbar) now lets you pick a specific iOS/Android device; the preview adds rounded corners, camera cutouts and the correct safe zones, so pointer UI can be checked against real screen bounds.
+- **UE Remote** (iOS/Android app) replays touch input from a real phone into the editor session — the only way to test native pinch/swipe recognition before publishing.
+- v42.10 also added (digest-verified, `/Fortnite.com/Input/Character`, all Experimental): `Move : input_action(vector3)` on `TraversalMapping`, and `InteractMapping` with `Interact : input_action(logic)`. They are separate from `TouchMapping` and subscribe the same way (`GetInputEvents(Move).TriggerActivationEvent` payload `tuple(player, vector3)`). Details: verse skill `sys_input_devices`.
 
 ## Reference files
 
