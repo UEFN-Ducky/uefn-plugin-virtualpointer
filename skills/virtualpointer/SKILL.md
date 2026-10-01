@@ -4,7 +4,7 @@ description: "UEFN Virtual Pointer — cross-platform pointer input via Verse En
 license: MIT
 metadata:
   label: UEFN Virtual Pointer
-  version: 4
+  version: 5
   author: UEFN-Ducky
   copyright: Copyright 2026 Mindful Path Company, LLC
   allow_redistribute: true
@@ -149,3 +149,9 @@ All templates subscribe existing players + `PlayerAddedEvent`, keep cancelables 
 ## Verify
 
 `workspace_compile_verse` then `get_verse_editables` on the pointer device.
+
+## 42.30 mobile fixes
+
+- Interact and pick-up button icons can be overridden again.
+- Shoot/fire button visibility no longer depends on holding Aim.
+- Mobile players can no longer move while all their input is consumed.
