@@ -4,7 +4,7 @@ description: "UEFN Virtual Pointer — cross-platform pointer input via Verse En
 license: MIT
 metadata:
   label: UEFN Virtual Pointer
-  version: 5
+  version: 6
   author: UEFN-Ducky
   copyright: Copyright 2026 Mindful Path Company, LLC
   allow_redistribute: true
@@ -145,10 +145,16 @@ All templates subscribe existing players + `PlayerAddedEvent`, keep cancelables 
   Load when: Zoom camera or resize props/entities with pinch (Experimental)
 - `references/example_trace_device.md` — Full `screenspace_trace_device` sample
   Load when: Scaffolding a complete creative_device for VP picking
+- `references/touch_layout_override.md` — Developer touchscreen layouts: UMG Canvas + Touch Control Layout Override (`DeveloperLayoutButtonProxy`) on a HUD Controller, Apply Canvas Transform (42.40), hiding default buttons from Verse
+  Load when: Moving, re-icons, recoloring or hiding Fortnite's default touch buttons (Jump, Shoot, Sprint …), HUD Controller touch layout, or mobile buttons the island doesn't use
 
 ## Verify
 
 `workspace_compile_verse` then `get_verse_editables` on the pointer device.
+
+## 42.40 mobile fixes
+
+HUD Controller touch layouts: Jetpack Jump/Sprint → Up/Boost, Shoot with an empty override widget, Carry/Drop overridable, overridden Sprint/Shoot/Reload/Crouch let touches pass through; new **Apply Canvas Transform** for icon-only overrides — `touch_layout_override`.
 
 ## 42.30 mobile fixes
 
