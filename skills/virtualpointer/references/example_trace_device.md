@@ -1,3 +1,9 @@
+---
+description: "Complete publishable Verse device: enables Virtual Pointer for every player, listens to PointerSelect and reports the world objects under the pointer"
+metadata:
+  label: "Example trace device"
+---
+
 # Example: screenspace_trace_device
 
 Complete Verse device that turns on Virtual Pointer mode for every player, subscribes to `PointerSelect`, and reports world objects that intersect the pointer trace. Uses only `TouchMapping` + `PointerSelect`, so it is **publishable**.

@@ -1,3 +1,9 @@
+---
+description: "Detect swipes and taps with Virtual Pointer (touch, mouse drag or left stick): gesture phases, distance threshold, direction and per-player state"
+metadata:
+  label: "Swipe"
+---
+
 # Swipe / tap detection with Virtual Pointer
 
 Detect when the player swipes a finger in a direction, or takes the equivalent action with mouse drag or gamepad left-stick drag. Uses only `TouchMapping` + `PointerSelect`, so it is **publishable**.

@@ -1,3 +1,9 @@
+---
+description: "Find world objects under a tap or click: deproject the Virtual Pointer position into a ray, sweep the scene, API notes and tuning"
+metadata:
+  label: "Screen-space trace"
+---
+
 # Screen-space deproject + world sweep
 
 > **Snippets here are fragments.** The `using` block in this file's first code

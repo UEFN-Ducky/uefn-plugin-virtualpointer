@@ -1,3 +1,9 @@
+---
+description: "Turn Virtual Pointer on and off per player with the TouchMapping input mapping, stasis while it is on, device mapping, caveats and custom mappings"
+metadata:
+  label: "Enable and disable"
+---
+
 # Enable / disable Virtual Pointer
 
 > **Snippets here are fragments.** The `using` block in this file's first code

@@ -1,3 +1,9 @@
+---
+description: "PointerSelect screen-space coordinates: units and axes, subscribing after TouchMapping, the input events it fires and cleanup"
+metadata:
+  label: "PointerSelect"
+---
+
 # PointerSelect — screen-space coordinates
 
 `PointerSelect` is an `input_action(vector3)` in `/Verse.org/Input/UI` (FN ≥ 4100, **publishable**). The `vector3` carries the screen-space pointer position.

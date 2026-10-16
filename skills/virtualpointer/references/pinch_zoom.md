@@ -1,3 +1,9 @@
+---
+description: "PointerZoom (experimental, not publishable): pinch, mouse wheel and right-stick zoom, logging it and scaling a Scene Graph entity with pinch"
+metadata:
+  label: "Pinch zoom"
+---
+
 # PointerZoom — pinch, scroll, right-stick zoom / scale (Experimental)
 
 `PointerZoom` is an `@experimental` `input_action(vector3)` in `/Verse.org/Input/UI` (FN ≥ 4120). **Islands that use PointerZoom cannot be published.** Say so before writing it, and keep it in its own device so it can be removed.
